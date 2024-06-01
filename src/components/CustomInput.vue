@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, defineModel } from 'vue';
-import { getCanvasFont, measureWidth } from '@/utility';
+import { getCanvasFont, measureWidth } from '@/utility/font';
 
 const input = ref(null);
 const focused = ref(false);
