@@ -13,12 +13,14 @@ export class SuffixArray<T>
 
     search(term: string) {
 
+        const normalizedTerm = term.toLowerCase();
+
         // Find first suffix that begins with term
         let left = 0;
         let right = this.entries.length;
         while (left < right) {
             const mid = Math.floor((left + right) / 2);
-            if (term > this.entries[mid].suffix) {
+            if (normalizedTerm > this.entries[mid].suffix) {
                 left = mid + 1;
             }
             else {
@@ -31,7 +33,7 @@ export class SuffixArray<T>
         right = this.entries.length;
         while (left < right) {
             const mid = Math.floor((left + right) / 2);
-            if (this.entries[mid].suffix.startsWith(term)) {
+            if (this.entries[mid].suffix.startsWith(normalizedTerm)) {
                 left = mid + 1;
             }
             else {
