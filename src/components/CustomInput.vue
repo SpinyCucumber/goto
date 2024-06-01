@@ -1,8 +1,9 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed, defineModel } from 'vue';
 import { getCanvasFont, measureWidth } from '@/utility/font';
 
 defineEmits(["enter"]);
+defineProps<{autofocus: boolean}>();
 
 const input = ref(null);
 const focused = ref(false);
@@ -21,7 +22,6 @@ const caretStyle = computed(() => {
     // and move caret to appropriate place
     if (input.value !== null) {
         const font = getCanvasFont(inputStyles.value);
-        console.log(font);
         const paddingLeft = parseInt(inputStyles.value.getPropertyValue('padding-left')) + 2;
         const width = measureWidth(model.value, font) + paddingLeft;
         result.transform = `translate(${width}px, -50%)`;
@@ -36,7 +36,8 @@ const caretStyle = computed(() => {
         <input class="input" type="text" ref="input" v-model="model"
             @focus="focused = true"
             @blur="focused = false"
-            v-on:keyup.enter="$emit('enter')"/>
+            v-on:keyup.enter="$emit('enter')"
+            :autofocus="autofocus"/>
         <span class="caret" :style="caretStyle">_</span>
     </div>
 </template>

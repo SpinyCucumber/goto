@@ -1,20 +1,18 @@
 <script setup lang="ts">
 import CustomInput from '@/components/CustomInput.vue';
 import { SuffixArrayBuilder } from '@/utility/suffixArray';
-import { computed, ref, type Ref } from 'vue';
+import axios from 'axios';
+import { computed, onMounted, ref, type Ref } from 'vue';
 
 interface Link {
   name: string;
   uri: string;
-  tags: string[];
+  tags?: string[];
 }
 
-// TODO Retrieve links from query
+const props = defineProps<{sourceUri: string}>();
 const search = ref("");
-const links: Ref<Link[]> = ref([
-  { name: "Wikipedia", uri: "https://en.wikipedia.org", tags: ["wiki"] },
-  { name: "The Crimson White", uri: "https://thecrimsonwhite.com/", tags: ["news", "bama"] }
-]);
+const links: Ref<Link[]> = ref([]);
 
 // We compute a search index from list of links
 const suffixArray = computed(() => {
@@ -24,8 +22,10 @@ const suffixArray = computed(() => {
     const uri = new URL(link.uri);
     builder.addLabel(link, link.name);
     builder.addLabel(link, uri.host);
-    for (const tag of link.tags) {
-      builder.addLabel(link, tag);
+    if (link.tags !== undefined) {
+      for (const tag of link.tags) {
+        builder.addLabel(link, tag);
+      }
     }
   }
   return builder.build();
@@ -33,6 +33,7 @@ const suffixArray = computed(() => {
 
 // Search results computed using search term and search index
 const searchResults = computed(() => {
+  if (search.value === "") return [];
   return suffixArray.value.search(search.value);
 })
 
@@ -40,15 +41,24 @@ function activate(link: Link) {
   window.open(link.uri, "_blank");
 }
 
+async function fetchLinks() {
+  const response = await axios.get<Link[]>(props.sourceUri);
+  links.value = response.data;
+}
+
+onMounted(async () => {
+  await fetchLinks();
+});
+
 </script>
 
 <template>
   <main>
-    <CustomInput class="search-input" v-model="search" @enter="activate(searchResults[0])"/>
+    <CustomInput class="search-input" v-model="search" @enter="activate(searchResults[0])" autofocus/>
     <ul class="results">
       <li v-for="result in searchResults" @click="activate(result)">
         <span class="result-name">{{ result.name }}</span>
-        <span class="result-tags">({{ result.tags.join(",") }})</span>
+        <span class="result-tags" v-if="result.tags">({{ result.tags.join(",") }})</span>
       </li>
     </ul>
   </main>
