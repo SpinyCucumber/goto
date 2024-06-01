@@ -42,7 +42,7 @@ const searchResults = computed(() => {
     .toArray()
 })
 
-function activate(link: Link) {
+function activateLink(link: Link) {
   window.open(link.uri, "_blank");
 }
 
@@ -55,14 +55,20 @@ onMounted(async () => {
   await fetchLinks();
 });
 
+function onEnter() {
+  if (searchResults.value.length > 0) {
+    activateLink(searchResults.value[0]);
+  }
+}
+
 </script>
 
 <template>
   <main>
-    <CustomInput class="search-input" v-model="search" @enter="activate(searchResults[0])" autofocus/>
+    <CustomInput class="search-input" v-model="search" @enter="onEnter" autofocus/>
     <div class="results">
       <ul class="result-list">
-        <li v-for="result in searchResults" @click="activate(result)">
+        <li v-for="result in searchResults" @click="activateLink(result)">
           <span class="result-name">{{ result.name }}</span>
           <span class="result-tags" v-if="result.tags">({{ result.tags.join(",") }})</span>
         </li>
