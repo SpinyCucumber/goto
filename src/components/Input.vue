@@ -19,9 +19,10 @@ const caretStyle = computed(() => {
     // and move caret to appropriate place
     if (input.value !== null) {
         const font = getCanvasFont(inputStyles.value);
+        console.log(font);
         const paddingLeft = parseInt(inputStyles.value.getPropertyValue('padding-left')) + 2;
         const width = measureWidth(model.value, font) + paddingLeft;
-        result.transform = `translate(${width}px, 0)`;
+        result.transform = `translate(${width}px, -50%)`;
     }
     return result;
 });
@@ -47,6 +48,7 @@ const caretStyle = computed(() => {
     color: inherit;
     background: none;
     border: 2px solid var(--color-border);
+    padding: 0.5em;
     border-radius: 8px;
     caret-color: transparent;
 }
@@ -58,8 +60,9 @@ const caretStyle = computed(() => {
 .caret {
     position: absolute;
     left: 0;
+    top: 50%;
     transition: transform 0.2s;
-    animation: blink 1s step-start infinite;
+    animation: blink 1s infinite;
 }
 
 @keyframes blink {
