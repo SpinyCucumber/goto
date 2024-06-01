@@ -9,7 +9,7 @@ interface Link {
   tags: string[];
 }
 
-// TODO Retrieve from URL
+// TODO Retrieve links from query
 const search = ref("");
 const links: Ref<Link[]> = ref([
   { name: "Wikipedia", uri: "https://en.wikipedia.org", tags: ["wiki"] },
@@ -37,14 +37,14 @@ const searchResults = computed(() => {
 })
 
 function activate(link: Link) {
-  window.open(link.uri);
+  window.open(link.uri, "_blank");
 }
 
 </script>
 
 <template>
   <main>
-    <CustomInput class="search-input" v-model="search"/>
+    <CustomInput class="search-input" v-model="search" @enter="activate(searchResults[0])"/>
     <ul class="results">
       <li v-for="result in searchResults" @click="activate(result)">
         <span class="result-name">{{ result.name }}</span>
@@ -58,7 +58,7 @@ function activate(link: Link) {
 main {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .search-input {
@@ -73,6 +73,7 @@ main {
 }
 
 .results > li {
+  --color: var(--color-text);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -88,24 +89,16 @@ main {
 
 .results > li:hover {
   background-color: var(--color-link-hover);
-}
-
-.results > li:hover .result-name {
-  color: var(--color-link);
-}
-
-.results > li:hover .result-tags {
-  color: color-mix(in srgb, var(--color-link) 25%, transparent);
+  --color: var(--color-link);
 }
 
 .result-name {
   font-size: 18px;
-  transition: color 0.25s;
+  color: var(--color);
 }
 
 .result-tags {
   font-size: 16px;
-  color: color-mix(in srgb, var(--color-text) 25%, transparent);
-  transition: color 0.25s;
+  color: color-mix(in srgb, var(--color) 25%, transparent);
 }
 </style>

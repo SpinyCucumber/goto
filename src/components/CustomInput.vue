@@ -2,6 +2,8 @@
 import { ref, computed, defineModel } from 'vue';
 import { getCanvasFont, measureWidth } from '@/utility/font';
 
+defineEmits(["enter"]);
+
 const input = ref(null);
 const focused = ref(false);
 const model = defineModel();
@@ -33,7 +35,8 @@ const caretStyle = computed(() => {
     <div class="container">
         <input class="input" type="text" ref="input" v-model="model"
             @focus="focused = true"
-            @blur="focused = false"/>
+            @blur="focused = false"
+            v-on:keyup.enter="$emit('enter')"/>
         <span class="caret" :style="caretStyle">_</span>
     </div>
 </template>
