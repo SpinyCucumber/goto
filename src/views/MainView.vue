@@ -60,12 +60,14 @@ onMounted(async () => {
 <template>
   <main>
     <CustomInput class="search-input" v-model="search" @enter="activate(searchResults[0])" autofocus/>
-    <ul class="results">
-      <li v-for="result in searchResults" @click="activate(result)">
-        <span class="result-name">{{ result.name }}</span>
-        <span class="result-tags" v-if="result.tags">({{ result.tags.join(",") }})</span>
-      </li>
-    </ul>
+    <div class="results">
+      <ul class="result-list">
+        <li v-for="result in searchResults" @click="activate(result)">
+          <span class="result-name">{{ result.name }}</span>
+          <span class="result-tags" v-if="result.tags">({{ result.tags.join(",") }})</span>
+        </li>
+      </ul>
+    </div>
   </main>
 </template>
 
@@ -83,11 +85,24 @@ main {
 }
 
 .results {
-  list-style-type: none;
-  padding-left: 0;
+  flex: 1;
+  position: relative;
+  overflow: auto;
 }
 
-.results > li {
+.result-list {
+  position: absolute;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  list-style-type: none;
+  padding-left: 0;
+  margin-right: 1rem;
+}
+
+.result-list > li {
   --color: var(--color-text);
   display: flex;
   align-items: center;
@@ -98,11 +113,11 @@ main {
   transition: background-color 0.25s;
 }
 
-.results > li + li {
+.result-list > li + li {
   border-top: 1px solid color-mix(in srgb, var(--color-border) 25%, transparent);
 }
 
-.results > li:hover {
+.result-list > li:hover {
   background-color: var(--color-link-hover);
   --color: var(--color-link);
 }

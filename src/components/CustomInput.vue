@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, defineModel } from 'vue';
+import { ref, computed, defineModel, type CSSProperties } from 'vue';
 import { getCanvasFont, measureWidth } from '@/utility/font';
 
 defineEmits(["enter"]);
@@ -7,7 +7,7 @@ defineProps<{autofocus: boolean}>();
 
 const input = ref(null);
 const focused = ref(false);
-const model = defineModel();
+const model = defineModel<string>();
 model.value = '';
 
 const inputStyles = computed(() => {
@@ -17,13 +17,13 @@ const inputStyles = computed(() => {
 });
 
 const caretStyle = computed(() => {
-    const result = { visibility: focused.value ? "visible" : "hidden" };
+    const result: CSSProperties = { visibility: focused.value ? "visible" : "hidden" };
     // If input is loaded, retrieve width of input text
     // and move caret to appropriate place
     if (input.value !== null) {
-        const font = getCanvasFont(inputStyles.value);
-        const paddingLeft = parseInt(inputStyles.value.getPropertyValue('padding-left')) + 2;
-        const width = measureWidth(model.value, font) + paddingLeft;
+        const font = getCanvasFont(inputStyles.value!);
+        const paddingLeft = parseInt(inputStyles.value!.getPropertyValue('padding-left')) + 2;
+        const width = measureWidth(model.value!, font) + paddingLeft;
         result.transform = `translate(${width}px, -50%)`;
     }
     return result;
