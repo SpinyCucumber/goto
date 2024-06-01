@@ -40,11 +40,13 @@ const caretStyle = computed(() => {
 
 <style scoped>
 .container {
+    display: flex;
+    flex-direction: column;
     position: relative;
 }
 
 .input {
-    font-family: inherit;
+    font: inherit;
     color: inherit;
     background: none;
     border: 2px solid var(--color-border);
