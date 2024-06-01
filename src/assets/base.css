@@ -6,9 +6,10 @@
   --c-white: #ffffff;
   --c-white-soft: #f8f8f8;
   --c-white-muted: #cdcdcd;
+  --c-gray-light: #828282;
   --c-black: #000000;
   --c-black-soft: #1b1b1b;
-  --c-indigo: #0f0a29;
+  --c-indigo: #0b0a29;
   --c-slate: #5765c4;
   --c-slate-dark: #232c63;
 }
