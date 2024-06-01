@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import CustomInput from '@/components/CustomInput.vue';
 import { SuffixArrayBuilder } from '@/utility/suffixArray';
-import axios from 'axios';
 import { computed, onMounted, ref, type Ref } from 'vue';
+import axios from 'axios';
 
 interface Link {
   name: string;
@@ -32,9 +32,14 @@ const suffixArray = computed(() => {
 });
 
 // Search results computed using search term and search index
+// We sort results by number of substring matches
 const searchResults = computed(() => {
   if (search.value === "") return [];
-  return suffixArray.value.search(search.value);
+  return suffixArray.value.search(search.value).frequencies
+    .toSeq()
+    .sort().reverse()
+    .keySeq()
+    .toArray()
 })
 
 function activate(link: Link) {

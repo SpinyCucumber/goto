@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { SuffixArrayBuilder } from "./suffixArray";
+import { SuffixArrayBuilder, SearchResult } from "./suffixArray";
 
 test("should search string array", () => {
     
@@ -12,11 +12,10 @@ test("should search string array", () => {
     const suffixArray = builder.build();
 
     // Test
-    expect(suffixArray.search("at")).to.have.members(["tomato", "cat"]);
-    expect(suffixArray.search("an")).to.have.members(["japan", "ant"]);
-    expect(suffixArray.search("t")).to.have.members(["tomato", "cat", "ant"]);
-    expect(suffixArray.search("tomato")).to.have.members(["tomato"]);
-    expect(suffixArray.search("")).to.have.members(array);
-    expect(suffixArray.search("abc")).to.have.members([]);
+    expect(suffixArray.search("an")).toEqual(new SearchResult([["japan", 1], ["ant", 1]]));
+    expect(suffixArray.search("t")).toEqual(new SearchResult([["tomato", 2], ["cat", 1], ["ant", 1]]));
+    expect(suffixArray.search("tomato")).toEqual(new SearchResult([["tomato", 1]]));
+    expect(suffixArray.search("")).toEqual(new SearchResult(array.map(string => ([string, string.length]))));
+    expect(suffixArray.search("abc")).toEqual(new SearchResult([]));
     
 });

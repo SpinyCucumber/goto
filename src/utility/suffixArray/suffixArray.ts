@@ -1,14 +1,26 @@
+import Immutable from "immutable";
+
 interface SuffixArrayEntry<T> {
     suffix: string;
     values: T[];
 }
 
+export class SearchResult<T> {
+
+    public readonly frequencies: Immutable.Map<T, number>
+
+    constructor(frequencies: Iterable<[T, number]>) {
+        this.frequencies = Immutable.Map(frequencies);
+    }
+
+}
+
 export class SuffixArray<T>
 {
-    private entries: SuffixArrayEntry<T>[];
+    private readonly entries: Immutable.List<SuffixArrayEntry<T>>
 
-    constructor(entries: SuffixArrayEntry<T>[]) {
-        this.entries = entries;
+    constructor(entries: Iterable<SuffixArrayEntry<T>>) {
+        this.entries = Immutable.List(entries);
     }
 
     search(term: string) {
@@ -17,10 +29,10 @@ export class SuffixArray<T>
 
         // Find first suffix that begins with term
         let left = 0;
-        let right = this.entries.length;
+        let right = this.entries.size;
         while (left < right) {
             const mid = Math.floor((left + right) / 2);
-            if (normalizedTerm > this.entries[mid].suffix) {
+            if (normalizedTerm > this.entries.get(mid)!.suffix) {
                 left = mid + 1;
             }
             else {
@@ -30,10 +42,10 @@ export class SuffixArray<T>
         const start = left;
 
         // Find second suffix that begins with term
-        right = this.entries.length;
+        right = this.entries.size;
         while (left < right) {
             const mid = Math.floor((left + right) / 2);
-            if (this.entries[mid].suffix.startsWith(normalizedTerm)) {
+            if (this.entries.get(mid)!.suffix.startsWith(normalizedTerm)) {
                 left = mid + 1;
             }
             else {
@@ -41,8 +53,16 @@ export class SuffixArray<T>
             }
         }
 
-        // Return all values contained in range (must also remove duplicates)
-        return Array.from(new Set(this.entries.slice(start, right).flatMap(entry => entry.values)));
+        // Return all values contained in range
+        // We count number of times each value occurs
+        const frequencies = new Map<T, number>();
+        for (const {values} of this.entries.slice(start, right)) {
+            for (const value of values) {
+                let frequency = frequencies.get(value) ?? 0;
+                frequencies.set(value, frequency + 1);
+            }
+        }
+        return new SearchResult(frequencies);
     }
 }
 
