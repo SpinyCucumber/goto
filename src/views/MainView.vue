@@ -2,39 +2,21 @@
 import CustomInput from '@/components/CustomInput.vue';
 import { SuffixArrayBuilder } from '@/utility/suffixArray';
 import { computed, onMounted, ref, type Ref } from 'vue';
+import { type IConfig, type ILink, getLinks } from '@/config';
+import { UsedTermsLocalStorage } from '@/usedTerms';
 import Immutable from 'immutable';
-import axios from 'axios';
+import useLocalStorage from '@/utility/useLocalStorage';
 
-interface Link {
-  name: string;
-  uri: string;
-  tags?: string[];
-}
-
-interface UsedTerms {
-  [key:string]: number
-}
-
-function getUsedTerms(link: Link): UsedTerms | undefined {
-  const item = window.localStorage.getItem(link.uri);
-  if (item === null) return undefined;
-  return JSON.parse(item);
-}
-
-function setUsedTerms(link: Link, usedTerms: UsedTerms) {
-  const item = JSON.stringify(usedTerms);
-  window.localStorage.setItem(link.uri, item);
-}
-
-const props = defineProps<{sourceUri: string}>();
+const usedTerms = new UsedTermsLocalStorage();
 const search = ref("");
-const links: Ref<Link[]> = ref([]);
+const links: Ref<ILink[]> = ref([]);
+const config = useLocalStorage<IConfig>("config", {});
 
 // We compute a search index from list of links
 const suffixArray = computed(() => {
 
   const start = performance.now();
-  const builder = new SuffixArrayBuilder<Link>();
+  const builder = new SuffixArrayBuilder<ILink>();
   for (const link of links.value) {
 
     // Break URI into separate labels (host parts, path parts)
@@ -61,11 +43,8 @@ const suffixArray = computed(() => {
     }
 
     // Add previously used terms as labels
-    const usedTerms = getUsedTerms(link);
-    if (usedTerms !== undefined) {
-      for (const [term, amount] of Object.entries(usedTerms)) {
-        builder.addLabel(link, term, amount);
-      }
+    for (const [term, amount] of usedTerms.get(link)) {
+      builder.addLabel(link, term, amount);
     }
 
   }
@@ -89,23 +68,13 @@ const maxFrequency = computed(() => {
   return Math.max(...searchResults.value.map(([_, frequency]) => frequency));
 });
 
-function activateLink(link: Link) {
-  // Increment number of times search term used to access link
-  const analytics = getUsedTerms(link) ?? {};
-  const term = search.value;
-  analytics[term] = (analytics[term] ?? 0) + 1;
-  setUsedTerms(link, analytics);
-
+function activateLink(link: ILink) {
+  usedTerms.increment(link, search.value);
   window.open(link.uri, "_blank");
 }
 
-async function fetchLinks() {
-  const response = await axios.get<Link[]>(props.sourceUri);
-  links.value = response.data;
-}
-
 onMounted(async () => {
-  await fetchLinks();
+  links.value = await getLinks(config.value);
 });
 
 function onEnter() {
