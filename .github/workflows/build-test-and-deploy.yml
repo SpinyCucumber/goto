@@ -32,7 +32,7 @@ jobs:
       run: npm ci
 
     - name: npm run build
-      run: npm run build
+      run: npm run build -- --base=/goto/
 
     - name: npm run test
       run: npm run test
