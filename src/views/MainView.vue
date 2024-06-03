@@ -32,6 +32,8 @@ const links: Ref<Link[]> = ref([]);
 
 // We compute a search index from list of links
 const suffixArray = computed(() => {
+
+  const start = performance.now();
   const builder = new SuffixArrayBuilder<Link>();
   for (const link of links.value) {
 
@@ -67,7 +69,10 @@ const suffixArray = computed(() => {
     }
 
   }
-  return builder.build();
+  const result = builder.build();
+  const time = performance.now() - start;
+  console.log(`Built search index in ${10e-4*time}s`);
+  return result;
 });
 
 // Search results computed using search term and search index
