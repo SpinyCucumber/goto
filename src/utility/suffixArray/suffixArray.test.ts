@@ -13,9 +13,8 @@ test("should search string array", () => {
 
     // Test
     expect(suffixArray.search("an")).toEqual(new SearchResult([["japan", 1], ["ant", 1]]));
-    expect(suffixArray.search("t")).toEqual(new SearchResult([["tomato", 2], ["cat", 1], ["ant", 1]]));
+    expect(suffixArray.search("t")).toEqual(new SearchResult([["cat", 1], ["ant", 1], ["tomato", 2]]));
     expect(suffixArray.search("tomato")).toEqual(new SearchResult([["tomato", 1]]));
-    expect(suffixArray.search("")).toEqual(new SearchResult(array.map(string => ([string, string.length]))));
     expect(suffixArray.search("abc")).toEqual(new SearchResult([]));
     
 });

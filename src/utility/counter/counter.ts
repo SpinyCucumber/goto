@@ -7,8 +7,7 @@ export interface IFrozenCounter<T> extends Iterable<[T, number]> {
 
 export interface ICounter<T> extends IFrozenCounter<T> {
     // In-place increment
-    increment(key: T, amount: number): void;
-    increment(key: T): void;
+    increment(key: T, amount: number | undefined): void;
     // In-place add
     add(other: IFrozenCounter<T>): void;
 }

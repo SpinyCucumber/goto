@@ -2,6 +2,7 @@
 import CustomInput from '@/components/CustomInput.vue';
 import { SuffixArrayBuilder } from '@/utility/suffixArray';
 import { computed, onMounted, ref, type Ref } from 'vue';
+import Immutable from 'immutable';
 import axios from 'axios';
 
 interface Link {
@@ -35,9 +36,9 @@ const suffixArray = computed(() => {
 // We sort results by number of substring matches
 const searchResults = computed(() => {
   if (search.value === "") return [];
-  return suffixArray.value.search(search.value).frequencies
-    .toSeq()
-    .sort().reverse()
+  return Immutable.Seq(suffixArray.value.search(search.value).frequencies)
+    .sort()
+    .reverse()
     .toArray()
 });
 
