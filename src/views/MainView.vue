@@ -38,9 +38,13 @@ const searchResults = computed(() => {
   return suffixArray.value.search(search.value).frequencies
     .toSeq()
     .sort().reverse()
-    .keySeq()
     .toArray()
-})
+});
+
+// Highest frequency of any search result
+const maxFrequency = computed(() => {
+  return Math.max(...searchResults.value.map(([_, frequency]) => frequency));
+});
 
 function activateLink(link: Link) {
   window.open(link.uri, "_blank");
@@ -57,7 +61,7 @@ onMounted(async () => {
 
 function onEnter() {
   if (searchResults.value.length > 0) {
-    activateLink(searchResults.value[0]);
+    activateLink(searchResults.value[0][0]);
   }
 }
 
@@ -68,9 +72,11 @@ function onEnter() {
     <CustomInput class="search-input" v-model="search" @enter="onEnter" autofocus/>
     <div class="results">
       <ul class="result-list">
-        <li v-for="result in searchResults" @click="activateLink(result)">
-          <span class="result-name">{{ result.name }}</span>
-          <span class="result-tags" v-if="result.tags">({{ result.tags.join(",") }})</span>
+        <li v-for="result in searchResults"
+          @click="activateLink(result[0])"
+          :style="{ '--score': `${result[1] / maxFrequency}`}">
+          <span class="result-name">{{ result[0].name }}</span>
+          <span class="result-tags" v-if="result[0].tags">({{ result[0].tags.join(",") }})</span>
         </li>
       </ul>
     </div>
@@ -116,7 +122,7 @@ main {
   padding-top: 0.4rem;
   padding-bottom: 0.4rem;
   padding-left: 0.4rem;
-  transition: background-color 0.25s;
+  transition: all 0.25s;
 }
 
 .result-list > li + li {
@@ -125,16 +131,16 @@ main {
 
 .result-list > li:hover {
   background-color: var(--color-link-hover);
-  --color: var(--color-link);
+  color: var(--color-link);
 }
 
 .result-name {
   font-size: 18px;
-  color: var(--color);
+  opacity: var(--score);
 }
 
 .result-tags {
   font-size: 16px;
-  color: color-mix(in srgb, var(--color) 25%, transparent);
+  opacity: 0.25;
 }
 </style>
