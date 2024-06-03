@@ -70,8 +70,10 @@ const maxFrequency = computed(() => {
 
 // When config changes, fetch links
 watch(config, async (newConfig, _) => {
-  console.log("Fetching links");
+  const start = performance.now();
   links.value = await getLinks(newConfig);
+  const time = performance.now() - start;
+  console.log(`Links fetched in ${10e-4*time}s`);
 }, { immediate: true });
 
 function activateLink(link: ILink) {
