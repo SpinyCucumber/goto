@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import CustomInput from '@/components/CustomInput.vue';
 import { SuffixArrayBuilder } from '@/utility/suffixArray';
-import { computed, onMounted, ref, type Ref } from 'vue';
+import { computed, ref, watch, type Ref } from 'vue';
 import { type IConfig, type ILink, getLinks } from '@/config';
 import { UsedTermsLocalStorage } from '@/usedTerms';
 import Immutable from 'immutable';
@@ -68,14 +68,16 @@ const maxFrequency = computed(() => {
   return Math.max(...searchResults.value.map(([_, frequency]) => frequency));
 });
 
+// When config changes, fetch links
+watch(config, async (newConfig, _) => {
+  console.log("Fetching links");
+  links.value = await getLinks(newConfig);
+}, { immediate: true });
+
 function activateLink(link: ILink) {
   usedTerms.increment(link, search.value);
   window.open(link.uri, "_blank");
 }
-
-onMounted(async () => {
-  links.value = await getLinks(config.value);
-});
 
 function onEnter() {
   if (searchResults.value.length > 0) {
