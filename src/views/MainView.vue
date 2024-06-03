@@ -11,6 +11,21 @@ interface Link {
   tags?: string[];
 }
 
+interface UsedTerms {
+  [key:string]: number
+}
+
+function getUsedTerms(link: Link): UsedTerms | undefined {
+  const item = window.localStorage.getItem(link.uri);
+  if (item === null) return undefined;
+  return JSON.parse(item);
+}
+
+function setUsedTerms(link: Link, usedTerms: UsedTerms) {
+  const item = JSON.stringify(usedTerms);
+  window.localStorage.setItem(link.uri, item);
+}
+
 const props = defineProps<{sourceUri: string}>();
 const search = ref("");
 const links: Ref<Link[]> = ref([]);
@@ -43,6 +58,14 @@ const suffixArray = computed(() => {
       }
     }
 
+    // Add previously used terms as labels
+    const usedTerms = getUsedTerms(link);
+    if (usedTerms !== undefined) {
+      for (const [term, amount] of Object.entries(usedTerms)) {
+        builder.addLabel(link, term, amount);
+      }
+    }
+
   }
   return builder.build();
 });
@@ -62,6 +85,12 @@ const maxFrequency = computed(() => {
 });
 
 function activateLink(link: Link) {
+  // Increment number of times search term used to access link
+  const analytics = getUsedTerms(link) ?? {};
+  const term = search.value;
+  analytics[term] = (analytics[term] ?? 0) + 1;
+  setUsedTerms(link, analytics);
+
   window.open(link.uri, "_blank");
 }
 
@@ -151,7 +180,7 @@ main {
 
 .result-name {
   font-size: 18px;
-  opacity: var(--score);
+  opacity: max(var(--score), 0.25);
 }
 
 .result-tags {
