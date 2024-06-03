@@ -91,7 +91,7 @@ export class SuffixArrayBuilder<T> implements ISuffixArrayBuilder<T>
                 counter = new Counter<T>();
                 this.suffixes.set(suffix, counter);
             }
-            counter.increment(value);
+            counter.increment(value, amount);
         }
     }
 
