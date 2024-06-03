@@ -19,15 +19,30 @@ const links: Ref<Link[]> = ref([]);
 const suffixArray = computed(() => {
   const builder = new SuffixArrayBuilder<Link>();
   for (const link of links.value) {
-    // Use name, URI host, URI path, and tags as labels
+
+    // Break URI into separate labels (host parts, path parts)
+    // Must strip preceding "/" of path
     const uri = new URL(link.uri);
-    builder.addLabel(link, link.name);
-    builder.addLabel(link, uri.host);
-    if (link.tags !== undefined) {
-      for (const tag of link.tags) {
-        builder.addLabel(link, tag);
+    const path = uri.pathname.substring(1);
+    if (path !== "") {
+      for (const pathPart of path.split("/")) {
+        builder.addLabel(link, pathPart, 1)
       }
     }
+    for (const hostPart of uri.hostname.split(".")) {
+      builder.addLabel(link, hostPart, 1)
+    }
+
+    // Add link name (weight higher than URI components)
+    builder.addLabel(link, link.name, 4);
+
+    // Add tags as labels
+    if (link.tags !== undefined) {
+      for (const tag of link.tags) {
+        builder.addLabel(link, tag, 1);
+      }
+    }
+
   }
   return builder.build();
 });
@@ -37,8 +52,7 @@ const suffixArray = computed(() => {
 const searchResults = computed(() => {
   if (search.value === "") return [];
   return Immutable.Seq(suffixArray.value.search(search.value).frequencies)
-    .sort()
-    .reverse()
+    .sort((a, b) => b[1] - a[1])
     .toArray()
 });
 
